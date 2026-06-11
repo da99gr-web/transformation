@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Transformación">
+<title>Mi Transformación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --bg4: #222222;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --accent: #c8f55a;
+  --accent-dim: rgba(200,245,90,0.12);
+  --accent-dim2: rgba(200,245,90,0.06);
+  --red: #ff5c5c;
+  --blue: #5ca8ff;
+  --amber: #ffb347;
+  --purple: #b57bff;
+  --pink: #ff7eb3;
+  --teal: #5cffd1;
+  --sidebar-w: 260px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;overflow:hidden}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh;height:100dvh}
+.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:100}
+.sidebar-head{padding:28px 20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.sidebar-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.sidebar-subtitle{font-size:12px;color:var(--text2);margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;color:var(--text2);font-family:var(--font);font-size:13px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--bg3)}
+.nav-item.active .nav-icon{background:var(--accent-dim)}
+.nav-label{flex:1;font-weight:500}
+.nav-pct{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.nav-item.active .nav-pct{color:var(--accent)}
+.sidebar-footer{padding:16px 20px calc(16px + var(--safe-bottom));border-top:1px solid var(--border)}
+.streak-display{background:var(--accent-dim2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.streak-num{font-size:22px;font-weight:600;color:var(--accent);font-family:var(--mono)}
+.streak-label{font-size:11px;color:var(--text2);line-height:1.4}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.menu-btn{width:36px;height:36px;border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border);color:var(--text);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
+.topbar-date{font-size:12px;color:var(--text2);font-family:var(--mono)}
+.content{flex:1;overflow-y:auto;padding:24px 20px calc(24px + var(--safe-bottom))}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;backdrop-filter:blur(2px)}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .menu-btn{display:flex}
+  .overlay.open{display:block}
+  .content{padding:16px 16px calc(16px + var(--safe-bottom))}
+}
+
+/* ── PAGES ── */
+.page{display:none}.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.card-title{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.card-title span{color:var(--text3)}
+
+/* ── METRICS GRID ── */
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.metric{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border)}
+.metric-val{font-size:26px;font-weight:600;font-family:var(--mono);color:var(--text);line-height:1}
+.metric-val.accent{color:var(--accent)}
+.metric-label{font-size:11px;color:var(--text2);margin-top:4px}
+.metric-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── CHECKLIST ── */
+.checklist{display:flex;flex-direction:column;gap:2px}
+.check-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;border:none;background:transparent;width:100%;text-align:left;color:var(--text);font-family:var(--font)}
+.check-item:hover{background:var(--bg3)}
+.check-item.done{opacity:.55}
+.check-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent}
+.check-item.done .check-box{background:var(--accent);border-color:var(--accent)}
+.check-tick{width:10px;height:10px;display:none}
+.check-item.done .check-tick{display:block;fill:var(--bg)}
+.check-text{flex:1}
+.check-title{font-size:13px;font-weight:500;line-height:1.3}
+.check-sub{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.check-item.done .check-title{text-decoration:line-through;color:var(--text3)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{margin-bottom:14px}
+.prog-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.prog-label{color:var(--text2)}
+.prog-num{color:var(--accent);font-family:var(--mono);font-weight:500}
+.prog-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .5s ease}
+
+/* ── SECTION LABEL ── */
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:18px 0 8px;padding:0 2px}
+
+/* ── SCHEDULE ── */
+.schedule{display:flex;flex-direction:column;gap:0}
+.sched-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)}
+.sched-item:last-child{border:none}
+.sched-time{font-size:11px;font-family:var(--mono);color:var(--text3);width:52px;flex-shrink:0;padding-top:2px}
+.sched-body{}
+.sched-name{font-size:13px;font-weight:500;color:var(--text)}
+.sched-desc{font-size:11px;color:var(--text2);margin-top:2px}
+.sched-tag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:20px;margin-top:4px;font-weight:500}
+.tag-accent{background:var(--accent-dim);color:var(--accent)}
+.tag-blue{background:rgba(92,168,255,.12);color:var(--blue)}
+.tag-amber{background:rgba(255,179,71,.12);color:var(--amber)}
+.tag-purple{background:rgba(181,123,255,.12);color:var(--purple)}
+.tag-pink{background:rgba(255,126,179,.12);color:var(--pink)}
+.tag-teal{background:rgba(92,255,209,.12);color:var(--teal)}
+.tag-red{background:rgba(255,92,92,.12);color:var(--red)}
+
+/* ── AREA BARS ── */
+.area-bars{display:flex;flex-direction:column;gap:10px}
+.area-row{display:flex;align-items:center;gap:10px}
+.area-name{font-size:12px;color:var(--text2);width:80px;flex-shrink:0}
+.area-track{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.area-fill{height:100%;border-radius:2px;transition:width .5s}
+.area-pct{font-size:11px;font-family:var(--mono);color:var(--text3);width:32px;text-align:right}
+
+/* ── WORKOUT ── */
+.workout-cycle{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.workout-day{border-radius:var(--radius-sm);padding:12px 14px;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;gap:12px}
+.workout-day.today{border-color:var(--accent);background:var(--accent-dim2)}
+.workout-day-num{font-size:11px;font-family:var(--mono);color:var(--text3);width:36px;flex-shrink:0}
+.workout-day.today .workout-day-num{color:var(--accent)}
+.workout-day-info{flex:1}
+.workout-day-name{font-size:13px;font-weight:500;color:var(--text)}
+.workout-day-muscles{font-size:11px;color:var(--text2);margin-top:2px}
+.workout-day.rest .workout-day-name{color:var(--text3)}
+.workout-badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500}
+.badge-today{background:var(--accent);color:var(--bg);font-weight:600}
+.badge-rest{background:var(--bg4);color:var(--text3)}
+.badge-done{background:rgba(92,255,209,.15);color:var(--teal)}
+
+/* ── EXERCISES LIST ── */
+.exercise-group{margin-bottom:16px}
+.ex-group-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.ex-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.ex-item:last-child{border:none}
+.ex-name{font-size:13px;color:var(--text)}
+.ex-sets{font-size:11px;font-family:var(--mono);color:var(--text2)}
+
+/* ── SKIN GRID ── */
+.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.skin-box{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border)}
+.skin-box-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.skin-point{font-size:11px;color:var(--text2);padding:3px 0;display:flex;gap:6px;line-height:1.4}
+.skin-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* ── MOOD ── */
+.mood-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.mood-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .15s;font-weight:500}
+.mood-btn:hover{border-color:var(--accent);color:var(--text)}
+.mood-btn.sel{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+
+/* ── MONTHLY ── */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+.month-head{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;font-family:var(--mono)}
+.month-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);cursor:default;border:1px solid transparent}
+.month-day.empty{background:transparent}
+.month-day.has-data{background:var(--accent-dim);color:var(--accent);border-color:rgba(200,245,90,.2)}
+.month-day.today{border-color:var(--accent);color:var(--accent)}
+.month-day.no-data{background:var(--bg3);color:var(--text3)}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-nav-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-family:var(--font)}
+.month-nav-btn:hover{background:var(--bg4)}
+.month-title{font-size:13px;font-weight:500;color:var(--text)}
+
+/* ── ALERT ── */
+.alert{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.6;border-left:3px solid}
+.alert-warn{background:rgba(255,179,71,.07);border-color:var(--amber);color:#d4a05a}
+.alert-info{background:rgba(92,168,255,.07);border-color:var(--blue);color:#5ca8ff}
+.alert-ok{background:rgba(200,245,90,.07);border-color:var(--accent);color:#a8cc4a}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:var(--font);cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn-accent:hover{background:#b5e040}
+
+/* ── COUNTER ── */
+.counter-wrap{display:flex;align-items:center;gap:10px}
+.counter-val{font-size:24px;font-weight:600;font-family:var(--mono);color:var(--text);min-width:40px;text-align:center}
+.counter-btn{width:34px;height:34px;border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font)}
+
+/* ── RELATION ── */
+.rel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.rel-box{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border)}
+.rel-val{font-size:28px;font-weight:600;font-family:var(--mono);color:var(--accent)}
+.rel-label{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:20px}
+.page-title{font-size:22px;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:calc(20px + var(--safe-bottom));left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
+.toast{background:var(--accent);color:var(--bg);padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .25s}
+.toast.show{opacity:1;transform:none}
+
+/* ── INPUT ── */
+input[type=text],input[type=number],textarea,select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;width:100%;outline:none}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--bg2)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+/* ── SETTINGS ── */
+.st-area-block{margin-bottom:14px}
+.st-area-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px;font-weight:500;color:var(--text2)}
+.st-task-row{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px}
+.st-task-info{flex:1;min-width:0}
+.st-task-title{font-size:13px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-task-sub{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-task-actions{display:flex;gap:4px;flex-shrink:0}
+.st-btn{padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:transparent;font-size:11px;cursor:pointer;font-family:var(--font);color:var(--text2);transition:all .15s}
+.st-btn:hover{background:var(--bg3)}
+.st-btn-del{color:var(--red);border-color:rgba(255,92,92,.2)}
+.st-btn-del:hover{background:rgba(255,92,92,.08)}
+.st-default-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:var(--bg4);color:var(--text3);margin-left:5px;vertical-align:middle}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.modal-title{font-size:15px;font-weight:600;color:var(--text)}
+.modal-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.modal-actions .btn{flex:1;justify-content:center}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">Mi Transformación</div>
+      <div class="sidebar-title">David</div>
+      <div class="sidebar-subtitle" id="sb-date">Cargando...</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-page="home">
+        <div class="nav-icon">🏠</div>
+        <span class="nav-label">Inicio</span>
+        <span class="nav-pct" id="np-home">—</span>
+      </button>
+      <button class="nav-item" data-page="sleep">
+        <div class="nav-icon">🌙</div>
+        <span class="nav-label">Sueño</span>
+        <span class="nav-pct" id="np-sleep">0%</span>
+      </button>
+      <button class="nav-item" data-page="exercise">
+        <div class="nav-icon">💪</div>
+        <span class="nav-label">Ejercicio</span>
+        <span class="nav-pct" id="np-exercise">0%</span>
+      </button>
+      <button class="nav-item" data-page="skin">
+        <div class="nav-icon">✨</div>
+        <span class="nav-label">Piel</span>
+        <span class="nav-pct" id="np-skin">0%</span>
+      </button>
+      <button class="nav-item" data-page="nutrition">
+        <div class="nav-icon">🥗</div>
+        <span class="nav-label">Nutrición</span>
+        <span class="nav-pct" id="np-nutrition">0%</span>
+      </button>
+      <button class="nav-item" data-page="mental">
+        <div class="nav-icon">🧠</div>
+        <span class="nav-label">Mental</span>
+        <span class="nav-pct" id="np-mental">0%</span>
+      </button>
+      <button class="nav-item" data-page="posture">
+        <div class="nav-icon">🧍</div>
+        <span class="nav-label">Postura y Visión</span>
+        <span class="nav-pct" id="np-posture">0%</span>
+      </button>
+      <button class="nav-item" data-page="relation">
+        <div class="nav-icon">❤️</div>
+        <span class="nav-label">Relación</span>
+        <span class="nav-pct" id="np-relation">0%</span>
+      </button>
+      <div style="margin:8px 0;border-top:1px solid var(--border)"></div>
+      <button class="nav-item" data-page="history">
+        <div class="nav-icon">📊</div>
+        <span class="nav-label">Historial mensual</span>
+        <span class="nav-pct"></span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <div class="nav-icon">⚙️</div>
+        <span class="nav-label">Ajustes de tareas</span>
+        <span class="nav-pct"></span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="streak-display">
+        <div class="streak-num" id="sb-streak">0</div>
+        <div class="streak-label">días consecutivos<br><span style="color:var(--accent);font-size:10px">¡No rompas la cadena!</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+      <div class="topbar-title" id="topbar-title">Inicio</div>
+      <div class="topbar-date" id="topbar-date"></div>
+    </div>
+    <div class="content" id="content">
+
+      <!-- ═══════════════ HOME ═══════════════ -->
+      <div class="page active" id="page-home">
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-val accent" id="h-overall">0%</div>
+            <div class="metric-label">Progreso hoy</div>
+            <div class="metric-sub">todas las áreas</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val accent" id="h-streak">0</div>
+            <div class="metric-label">Días seguidos</div>
+            <div class="metric-sub">racha actual</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="h-done">0</div>
+            <div class="metric-label">Tareas hechas</div>
+            <div class="metric-sub" id="h-total-sub">de 0 hoy</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="h-week">Sem 1</div>
+            <div class="metric-label">Semana</div>
+            <div class="metric-sub">del año</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Progreso por área</div>
+          <div class="area-bars" id="area-bars"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tu horario ideal del día</div>
+          <div class="schedule">
+            <div class="sched-item"><div class="sched-time">7:00</div><div class="sched-body"><div class="sched-name">Despertar — sin teléfono 10 min</div><div class="sched-desc">500ml agua inmediatamente</div></div></div>
+            <div class="sched-item"><div class="sched-time">7:15</div><div class="sched-body"><div class="sched-name">Rutina AM de piel (3 min)</div><div class="sched-desc">Limpiador suave → Niacinamida → FPS 50+</div><div><span class="sched-tag tag-purple">Piel</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">7:30</div><div class="sched-body"><div class="sched-name">Desayuno de verdad</div><div class="sched-desc">Huevos o yogur griego + fruta + creatina 5g</div><div><span class="sched-tag tag-teal">Nutrición</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">8:00</div><div class="sched-body"><div class="sched-name">Bloque de trabajo profundo (sin teléfono)</div><div class="sched-desc">Un solo monitor. Las horas más productivas.</div><div><span class="sched-tag tag-blue">Trabajo</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">10:00</div><div class="sched-body"><div class="sched-name">Pausa activa — 5 min de movilidad</div><div class="sched-desc">Estiramiento de pecho, caderas y espalda torácica</div><div><span class="sched-tag tag-accent">Postura</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">12:00</div><div class="sched-body"><div class="sched-name">Entrenamiento (45-60 min)</div><div class="sched-desc">Según el ciclo del día — ver tab Ejercicio</div><div><span class="sched-tag tag-accent">Ejercicio</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">13:30</div><div class="sched-body"><div class="sched-name">Almuerzo — proteína + carbos + verduras</div><div class="sched-desc">Pollo + arroz + verduras. Sin fritos.</div><div><span class="sched-tag tag-teal">Nutrición</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">14:00</div><div class="sched-body"><div class="sched-name">Trabajo bloque 2</div><div class="sched-desc">Regla 20-20-20 en pantalla</div><div><span class="sched-tag tag-blue">Trabajo</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">16:00</div><div class="sched-body"><div class="sched-name">1 hora de lectura</div><div class="sched-desc">Libro físico o Kindle — sin redes sociales</div><div><span class="sched-tag tag-amber">Lectura</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">17:00</div><div class="sched-body"><div class="sched-name">1 hora de aprendizaje</div><div class="sched-desc">Curso, tutorial, habilidad nueva — enfocado</div><div><span class="sched-tag tag-blue">Aprender</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">18:00</div><div class="sched-body"><div class="sched-name">Paseo del perro — práctica de postura</div><div class="sched-desc">Caminar erguido, pecho arriba, mirada al frente</div><div><span class="sched-tag tag-accent">Postura</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">19:30</div><div class="sched-body"><div class="sched-name">Cena con novia (sin teléfono)</div><div class="sched-desc">Prepara antes para no comer tarde</div><div><span class="sched-tag tag-pink">Relación</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">20:30</div><div class="sched-body"><div class="sched-name">2 horas de entretenimiento</div><div class="sched-desc">Película, serie, YouTube — con límite de tiempo</div><div><span class="sched-tag tag-purple">Entrete.</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">21:00</div><div class="sched-body"><div class="sched-name">Paseo del perro 2</div><div class="sched-desc">Bajar luces al llegar, nada estimulante</div></div></div>
+            <div class="sched-item"><div class="sched-time">21:30</div><div class="sched-body"><div class="sched-name">Rutina PM de piel (5 min)</div><div class="sched-desc">Limpiador → CeraVe crema hidratante</div><div><span class="sched-tag tag-purple">Piel</span></div></div></div>
+            <div class="sched-item"><div class="sched-time">22:30</div><div class="sched-body"><div class="sched-name">Teléfono abajo — apagar luces</div><div class="sched-desc">Sin pastillas. Melatonina 0.5mg si es necesario.</div><div><span class="sched-tag tag-red">Sueño</span></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ SLEEP ═══════════════ -->
+      <div class="page" id="page-sleep">
+        <div class="page-header">
+          <div class="page-title">Sueño</div>
+          <div class="page-sub">Prioridad #1 — todo lo demás depende de esto</div>
+        </div>
+        <div class="alert alert-warn">Actualmente duermes a la 1-2am mirando el teléfono. Esto destruye tu piel, músculos y energía. La transición es de 15 min por semana.</div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="sleep-prog-label">0/6</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="sleep-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="sleep-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Plan de transición (4 semanas)</div>
+          <div class="checklist">
+            <div style="padding:10px 14px;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px"><div class="check-title">Semana 1</div><div class="check-sub">Teléfono abajo a medianoche · dormir a 12:30 · despertar 8am</div></div>
+            <div style="padding:10px 14px;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px"><div class="check-title">Semana 2</div><div class="check-sub">Teléfono abajo a 11:30 · dormir a 12:00 · despertar 7:45am</div></div>
+            <div style="padding:10px 14px;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px"><div class="check-title">Semana 3</div><div class="check-sub">Teléfono abajo a 11:00 · dormir a 11:30 · despertar 7:30am</div></div>
+            <div style="padding:10px 14px;border-radius:var(--radius-sm);background:var(--accent-dim2);border:1px solid rgba(200,245,90,.15);margin-bottom:4px"><div class="check-title" style="color:var(--accent)">Semana 4+</div><div class="check-sub">Teléfono abajo a 10:30 · dormir a 11:00 · despertar 7:00am</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Qué pasa a la 1am vs 11pm</div>
+          <div class="skin-grid">
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--red)">A la 1am</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--red)"></div>Pico de cortisol por luz azul</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--red)"></div>Hormona de crecimiento suprimida</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--red)"></div>Reparación de piel bloqueada</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--red)"></div>Recuperación muscular nula</div>
+            </div>
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--accent)">A las 11pm</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--accent)"></div>Pico de GH entre 11pm-2am</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--accent)"></div>Células de piel se regeneran</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--accent)"></div>Músculos se reparan</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--accent)"></div>Cortisol baja naturalmente</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ EXERCISE ═══════════════ -->
+      <div class="page" id="page-exercise">
+        <div class="page-header">
+          <div class="page-title">Ejercicio</div>
+          <div class="page-sub">Ciclo de 6 días — sin importar el día de la semana</div>
+        </div>
+        <div class="alert alert-ok">70kg / 172cm — objetivo: recomposición corporal. Construir músculo, no perder peso.</div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="exercise-prog-label">0/5</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="exercise-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="exercise-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Tu ciclo de entrenamiento</div>
+          <div class="workout-cycle" id="workout-cycle"></div>
+        </div>
+        <div class="card" id="exercise-detail-card">
+          <div class="card-title" id="exercise-detail-title">Ejercicios de hoy</div>
+          <div id="exercise-detail"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Registro de peso corporal</div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div style="flex:1"><input type="number" id="weight-input" placeholder="70.0" step="0.1"> </div>
+            <button class="btn btn-accent" onclick="saveWeight()" style="white-space:nowrap">Guardar kg</button>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text2)" id="weight-history"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ SKIN ═══════════════ -->
+      <div class="page" id="page-skin">
+        <div class="page-header">
+          <div class="page-title">Piel</div>
+          <div class="page-sub">Queratosis pilaris · Rosácea · Daño solar · Estrías</div>
+        </div>
+        <div class="alert alert-info">Sin exfoliantes agresivos. Tu piel es seca y sensible — la rutina es suave y constante.</div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="skin-prog-label">0/10</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="skin-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="skin-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Protocolos específicos</div>
+          <div class="skin-grid">
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--amber)">KP (brazos, espalda, cara)</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--amber)"></div>Loción AmLactin a diario post-ducha</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--amber)"></div>Duchas tibias, no calientes</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--amber)"></div>Secar con toque suave</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--amber)"></div>Resultados visibles en 6-8 semanas</div>
+            </div>
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--pink)">Rosácea</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--pink)"></div>Sin alcohol, sin picante, sin agua caliente</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--pink)"></div>Ácido azelaico 10%</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--pink)"></div>FPS cada día — crítico</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--pink)"></div>Consultar dermatólogo</div>
+            </div>
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--blue)">Dos tonos (sol)</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--blue)"></div>Niacinamida 10% uniformiza</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--blue)"></div>Vitamina C AM en cuello y brazos</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--blue)"></div>FPS en cuello y brazos al salir</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--blue)"></div>Resultado visible en 3 meses</div>
+            </div>
+            <div class="skin-box">
+              <div class="skin-box-title" style="color:var(--purple)">Estrías (glúteos)</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--purple)"></div>No desaparecen, sí se atenúan</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--purple)"></div>Bio-Oil o aceite de rosa mosqueta</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--purple)"></div>Retinol en la zona ayuda</div>
+              <div class="skin-point"><div class="skin-dot" style="background:var(--purple)"></div>Hidratación constante</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ NUTRITION ═══════════════ -->
+      <div class="page" id="page-nutrition">
+        <div class="page-header">
+          <div class="page-title">Nutrición</div>
+          <div class="page-sub">2.400 kcal · 150g proteína · 3L agua</div>
+        </div>
+        <div class="alert alert-warn">Cereal, galletas y papas fritas trabajan contra todos tus objetivos. Sistema simple: cocina en batch el domingo.</div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="nutrition-prog-label">0/7</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="nutrition-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="nutrition-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Comidas rápidas con lo que ya tienes</div>
+          <div class="exercise-group">
+            <div class="ex-item"><div class="ex-name">Pollo + arroz + verduras congeladas</div><div class="ex-sets" style="color:var(--accent)">~55g prot</div></div>
+            <div class="ex-item"><div class="ex-name">3 huevos revueltos + 2 tostadas</div><div class="ex-sets" style="color:var(--accent)">~21g prot</div></div>
+            <div class="ex-item"><div class="ex-name">Yogur griego + banano + avena</div><div class="ex-sets" style="color:var(--accent)">~20g prot</div></div>
+            <div class="ex-item"><div class="ex-name">Atún + arroz + aguacate</div><div class="ex-sets" style="color:var(--accent)">~30g prot</div></div>
+            <div class="ex-item"><div class="ex-name">Batch dominical: pollo + arroz (5 porciones)</div><div class="ex-sets" style="color:var(--text3)">30 min</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Notas del día</div>
+          <textarea id="nutrition-notes" placeholder="¿Qué comiste hoy? ¿Cumpliste los macros?"></textarea>
+          <div class="btn-row"><button class="btn btn-accent" onclick="saveNutritionNotes()">Guardar nota</button></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ MENTAL ═══════════════ -->
+      <div class="page" id="page-mental">
+        <div class="page-header">
+          <div class="page-title">Salud mental</div>
+          <div class="page-sub">Atención, hábitos de pantalla y bienestar diario</div>
+        </div>
+        <div class="alert alert-info">TikTok hasta las 3am + trabajar con dos pantallas = desregulación de dopamina. Se resetea rápido una vez que empiezas.</div>
+        <div class="card">
+          <div class="card-title">Estado de ánimo hoy</div>
+          <div class="mood-row" id="mood-row">
+            <button class="mood-btn" onclick="setMood('Excelente')">Excelente</button>
+            <button class="mood-btn" onclick="setMood('Bien')">Bien</button>
+            <button class="mood-btn" onclick="setMood('Normal')">Normal</button>
+            <button class="mood-btn" onclick="setMood('Cansado')">Cansado</button>
+            <button class="mood-btn" onclick="setMood('Ansioso')">Ansioso</button>
+            <button class="mood-btn" onclick="setMood('Bajo')">Bajo</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="mental-prog-label">0/6</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="mental-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="mental-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Diario del día</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px" id="journal-prompt"></div>
+          <textarea id="journal-text" placeholder="Escribe aquí..."></textarea>
+          <div class="btn-row"><button class="btn btn-accent" onclick="saveJournal()">Guardar entrada</button></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ POSTURE ═══════════════ -->
+      <div class="page" id="page-posture">
+        <div class="page-header">
+          <div class="page-title">Postura y Visión</div>
+          <div class="page-sub">Tu perro es tu entrenador de caminado — úsalo</div>
+        </div>
+        <div class="alert alert-ok">La postura y el caminar se corrigen en 2-3 meses con práctica diaria. No necesitas equipos.</div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="posture-prog-label">0/9</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="posture-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="posture-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Cómo caminar correctamente</div>
+          <div class="exercise-group">
+            <div class="ex-item"><div class="ex-name">Cabeza neutra — mirada al frente, barbilla paralela al piso</div></div>
+            <div class="ex-item"><div class="ex-name">Hombros atrás y abajo — no tensos, no caídos</div></div>
+            <div class="ex-item"><div class="ex-name">Pecho ligeramente arriba y abierto</div></div>
+            <div class="ex-item"><div class="ex-name">Brazos se balancean naturalmente — brazo opuesto a pierna</div></div>
+            <div class="ex-item"><div class="ex-name">Talón al piso primero, luego rodar hacia los dedos</div></div>
+            <div class="ex-item"><div class="ex-name">Sin teléfono en mano mientras caminas</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ RELATION ═══════════════ -->
+      <div class="page" id="page-relation">
+        <div class="page-header">
+          <div class="page-title">Relación</div>
+          <div class="page-sub">Presencia real, no tiempo en paralelo</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Lista de hoy <span id="relation-prog-label">0/5</span></div>
+          <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="relation-prog" style="width:0%"></div></div></div>
+          <div class="checklist" id="relation-checklist"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Registro semanal</div>
+          <div class="rel-grid">
+            <div class="rel-box">
+              <div class="rel-val" id="rel-time">0</div>
+              <div class="rel-label">Horas de calidad esta semana</div>
+              <div class="counter-wrap" style="margin-top:8px">
+                <button class="counter-btn" onclick="adjustRel('time',-1)">−</button>
+                <button class="counter-btn" onclick="adjustRel('time',1)">+</button>
+              </div>
+            </div>
+            <div class="rel-box">
+              <div class="rel-val" id="rel-meals">0</div>
+              <div class="rel-label">Comidas sin teléfono esta semana</div>
+              <div class="counter-wrap" style="margin-top:8px">
+                <button class="counter-btn" onclick="adjustRel('meals',-1)">−</button>
+                <button class="counter-btn" onclick="adjustRel('meals',1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-ok">Cuando mejores tu sueño y reduzcas el tiempo de pantalla, serás una persona completamente diferente en esta relación. Trabaja en ti primero.</div>
+      </div>
+
+      <!-- ═══════════════ HISTORY ═══════════════ -->
+      <div class="page" id="page-history">
+        <div class="page-header">
+          <div class="page-title">Historial mensual</div>
+          <div class="page-sub">Progreso acumulado por área</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Calendario</div>
+          <div class="month-nav">
+            <button class="month-nav-btn" onclick="changeMonth(-1)">← Anterior</button>
+            <div class="month-title" id="month-title"></div>
+            <button class="month-nav-btn" onclick="changeMonth(1)">Siguiente →</button>
+          </div>
+          <div class="month-grid" id="month-grid"></div>
+          <div style="display:flex;gap:12px;font-size:11px;color:var(--text3);margin-top:8px">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--accent-dim);margin-right:4px"></span>Con datos</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--bg3);margin-right:4px"></span>Sin registro</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Progreso mensual por área</div>
+          <div id="monthly-area-stats"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Historial de peso corporal</div>
+          <div id="weight-chart-data"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Registro de estado de ánimo</div>
+          <div id="mood-history"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ SETTINGS ═══════════════ -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div class="page-title">Ajustes de tareas</div>
+          <div class="page-sub">Agrega, edita o elimina tareas de cualquier área</div>
+        </div>
+
+        <!-- Add task form -->
+        <div class="card">
+          <div class="card-title">➕ Agregar nueva tarea</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Área</div>
+              <select id="st-area">
+                <option value="sleep">🌙 Sueño</option>
+                <option value="exercise">💪 Ejercicio</option>
+                <option value="skin">✨ Piel</option>
+                <option value="nutrition">🥗 Nutrición</option>
+                <option value="mental">🧠 Mental</option>
+                <option value="posture">🧍 Postura y Visión</option>
+                <option value="relation">❤️ Relación</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Tarea</div>
+              <input type="text" id="st-title" placeholder="Ej: Meditar 10 minutos">
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Descripción (opcional)</div>
+              <input type="text" id="st-sub" placeholder="Ej: Usar la app Calm o respiración 4-7-8">
+            </div>
+            <button class="btn btn-accent" onclick="addCustomTask()" style="width:100%;justify-content:center">Agregar tarea</button>
+          </div>
+        </div>
+
+        <!-- Task list per area -->
+        <div id="settings-task-list"></div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">Editar tarea</div>
+    <div class="modal-field">
+      <label>Tarea</label>
+      <input type="text" id="edit-title" placeholder="Nombre de la tarea">
+    </div>
+    <div class="modal-field">
+      <label>Descripción</label>
+      <input type="text" id="edit-sub" placeholder="Descripción (opcional)">
+    </div>
+    <input type="hidden" id="edit-area">
+    <input type="hidden" id="edit-id">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveEditTask()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'david_transform_v3';
+const DAYS_CO = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MONTHS_CO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+// ── CHECKLISTS DATA ──
+const CHECKLISTS = {
+  sleep: [
+    {id:'s1', title:'Teléfono abajo antes de las 11pm', sub:'TikTok/IG/YouTube en cama es el mayor saboteador'},
+    {id:'s2', title:'En cama antes de las 11:30pm', sub:'Desplazar 15 min cada semana hasta llegar'},
+    {id:'s3', title:'Despertar a las 7am (alarma)', sub:'Incluidos fines de semana — el ritmo circadiano necesita consistencia'},
+    {id:'s4', title:'Sin siesta larga hoy (máximo 20 min)', sub:'Las siestas largas dificultan el sueño nocturno'},
+    {id:'s5', title:'Habitación fresca y oscura', sub:'Cortina blackout o antifaz, menos de 20°C'},
+    {id:'s6', title:'Sin pastillas para dormir esta noche', sub:'Habla con tu médico sobre cómo reducirlas gradualmente'},
+  ],
+  exercise: [
+    {id:'e1', title:'Creatina 5g tomada', sub:'El mejor suplemento para tus objetivos — mézclala en agua'},
+    {id:'e2', title:'150g+ de proteína hoy', sub:'~2g por kg — pollo, huevos, yogur griego, atún'},
+    {id:'e3', title:'Entrenamiento completado', sub:'Hasta 30 min es mejor que no hacer nada'},
+    {id:'e4', title:'Sobrecarga progresiva registrada', sub:'Más peso o más repeticiones que la última sesión'},
+    {id:'e5', title:'3L de agua consumidos', sub:'Fundamental para el rendimiento y la recuperación'},
+  ],
+  skin: [
+    {id:'sk1', title:'AM: Limpiador suave', sub:'CeraVe Hidratante o La Roche-Posay Toleriane — sin espuma'},
+    {id:'sk2', title:'AM: Suero de Niacinamida 10%', sub:'Reduce enrojecimiento, uniformiza el tono, atenúa daño solar'},
+    {id:'sk3', title:'AM: Protector solar FPS 50+', sub:'La Roche-Posay Anthelios — todos los días sin excepción'},
+    {id:'sk4', title:'PM: Limpiador suave', sub:'Eliminar el FPS y residuos del día'},
+    {id:'sk5', title:'PM: Crema hidratante CeraVe', sub:'Ceramidas reparan la barrera cutánea — clave para KP y piel seca'},
+    {id:'sk6', title:'AmLactin en brazos y espalda', sub:'Post-ducha, en piel ligeramente húmeda — para KP'},
+    {id:'sk7', title:'3L de agua hoy', sub:'La piel seca a menudo es simplemente deshidratación'},
+    {id:'sk8', title:'Sin tocarme la cara', sub:'Transfiere bacterias y empeora KP y rosácea'},
+    {id:'sk9', title:'FPS en cuello y brazos al salir', sub:'Para uniformizar los dos tonos por el sol'},
+    {id:'sk10', title:'Bio-Oil en estrías (glúteos)', sub:'Una vez al día — constancia es clave'},
+  ],
+  nutrition: [
+    {id:'n1', title:'Desayuno real (no cereal)', sub:'3 huevos + fruta · o yogur griego + avena · 5 minutos'},
+    {id:'n2', title:'150g+ de proteína alcanzados', sub:'Registra con Cronometer o MyFitnessPal'},
+    {id:'n3', title:'3L de agua', sub:'Empieza con 500ml antes del café'},
+    {id:'n4', title:'Creatina 5g', sub:'En cualquier bebida, a cualquier hora del día'},
+    {id:'n5', title:'Sin comida frita hoy', sub:'Reemplaza papas fritas por arroz o papa cocida'},
+    {id:'n6', title:'Verduras en al menos 1 comida', sub:'Bien para la piel, el intestino y la energía'},
+    {id:'n7', title:'Almuerzo preparado — no impulsivo', sub:'La carne sacada del refrigerador a tiempo'},
+  ],
+  mental: [
+    {id:'m1', title:'Sin teléfono los primeros 10 min al despertar', sub:'El doomscrolling matutino destruye el enfoque del día entero'},
+    {id:'m2', title:'Bloque de trabajo enfocado (sin multitarea)', sub:'Cierra la segunda pantalla mientras trabajas'},
+    {id:'m3', title:'10 min al aire libre sin audífonos', sub:'El paseo del perro cuenta — sin teléfono de vez en cuando'},
+    {id:'m4', title:'Sin redes sociales antes del mediodía', sub:'IG y TikTok fragmentan la atención — protege las mañanas'},
+    {id:'m5', title:'1 hora de lectura completada', sub:'Libro físico o Kindle — sin redes sociales'},
+    {id:'m6', title:'1 hora de aprendizaje completada', sub:'Curso, tutorial, habilidad nueva — enfocado y sin distracciones'},
+  ],
+  posture: [
+    {id:'p1', title:'Cabeza neutra al caminar — mirada al frente', sub:'No mirando el teléfono mientras caminas'},
+    {id:'p2', title:'Hombros atrás y abajo en el paseo', sub:'Imagina un hilo tirando de la cima de tu cabeza hacia arriba'},
+    {id:'p3', title:'Estiramiento de pecho — marco de puerta', sub:'3×30 seg — abre el pecho cerrado por computador'},
+    {id:'p4', title:'Estiramiento de flexores de cadera', sub:'30 seg cada lado × 3 — corrige la inclinación pélvica'},
+    {id:'p5', title:'Extensión torácica sobre silla', sub:'Manos detrás de la cabeza, extenderse sobre el respaldo. 10 reps'},
+    {id:'p6', title:'Wall angel — 15 repeticiones', sub:'Espalda plana en pared, subir y bajar brazos lentamente'},
+    {id:'p7', title:'Dead bug — 3×10 reps', sub:'Ejercicio de core que también entrena postura'},
+    {id:'p8', title:'Regla 20-20-20 aplicada en pantalla', sub:'Cada 20 min → mirar algo a 6m de distancia por 20 segundos'},
+    {id:'p9', title:'Modo nocturno en todas las pantallas después de las 7pm', sub:'Reduce luz azul + ayuda al sueño también'},
+  ],
+  relation: [
+    {id:'r1', title:'Teléfono guardado durante la cena', sub:'Cocinas para ella — eso importa. Sé presente.'},
+    {id:'r2', title:'Una conversación intencional', sub:'No de logística — algo del mundo interior de cada uno'},
+    {id:'r3', title:'Afecto físico iniciado', sub:'Abrazo, toque, o gesto pequeño — las cosas pequeñas se acumulan'},
+    {id:'r4', title:'Dije algo apreciativo y específico', sub:'"Me gustó cómo..." — no genérico'},
+    {id:'r5', title:'Planifiqué algo juntos para esta semana', sub:'Paseo, película, cena — algo compartido'},
+  ],
+};
+
+// ── WORKOUT CYCLE ──
+const WORKOUT_CYCLE = [
+  {day:1, name:'Tríceps + Espalda', tag:'Fuerza', color:'var(--blue)', exercises:[
+    {group:'Tríceps', items:[
+      {name:'Press francés (barra o mancuernas)',sets:'4×10'},
+      {name:'Extensión de tríceps en polea',sets:'4×12'},
+      {name:'Fondos en paralelas',sets:'3×máx'},
+      {name:'Patada de tríceps',sets:'3×12'},
+    ]},
+    {group:'Espalda', items:[
+      {name:'Dominadas o jalón al pecho',sets:'4×8-12'},
+      {name:'Remo con barra o mancuerna',sets:'4×10'},
+      {name:'Jalón al pecho agarre estrecho',sets:'3×12'},
+      {name:'Face pulls (polea)',sets:'3×15'},
+    ]},
+  ]},
+  {day:2, name:'Bíceps + Pecho', tag:'Fuerza', color:'var(--purple)', exercises:[
+    {group:'Pecho', items:[
+      {name:'Press de banca con barra o mancuernas',sets:'4×8-10'},
+      {name:'Press inclinado con mancuernas',sets:'3×10'},
+      {name:'Aperturas con mancuernas',sets:'3×12'},
+      {name:'Fondos en paralelas (pecho)',sets:'3×máx'},
+    ]},
+    {group:'Bíceps', items:[
+      {name:'Curl con barra',sets:'4×10'},
+      {name:'Curl con mancuernas alterno',sets:'3×12'},
+      {name:'Curl martillo',sets:'3×12'},
+      {name:'Curl en polea baja',sets:'3×12'},
+    ]},
+  ]},
+  {day:3, name:'Cuádriceps + Pierna + Abdomen', tag:'Fuerza', color:'var(--teal)', exercises:[
+    {group:'Cuádriceps y Pierna', items:[
+      {name:'Sentadilla con barra',sets:'4×8'},
+      {name:'Prensa de pierna',sets:'3×12'},
+      {name:'Extensión de cuádriceps',sets:'3×12'},
+      {name:'Peso muerto rumano',sets:'3×10'},
+      {name:'Curl femoral tumbado',sets:'3×12'},
+      {name:'Elevación de pantorrillas',sets:'4×15'},
+    ]},
+    {group:'Abdomen', items:[
+      {name:'Plancha frontal',sets:'3×45 seg'},
+      {name:'Crunch en polea o suelo',sets:'3×15'},
+      {name:'Elevación de piernas colgado',sets:'3×12'},
+      {name:'Rueda abdominal',sets:'3×10'},
+    ]},
+  ]},
+  {day:4, name:'Cardio', tag:'Cardio', color:'var(--amber)', exercises:[
+    {group:'Elige una opción', items:[
+      {name:'Correr (trote continuo)',sets:'30-45 min'},
+      {name:'Saltar cuerda',sets:'4×5 min con 1 min descanso'},
+      {name:'Montar en bicicleta',sets:'45-60 min a ritmo moderado'},
+    ]},
+  ]},
+  {day:5, name:'Descanso activo', tag:'Descanso', color:'var(--text3)', exercises:[
+    {group:'Día de recuperación', items:[
+      {name:'Caminata suave 20-30 min',sets:''},
+      {name:'Estiramientos de cuerpo completo',sets:'15-20 min'},
+      {name:'Rutina de movilidad (ver tab Postura)',sets:''},
+    ]},
+  ]},
+];
+
+// ── STATE ──
+let state = loadState();
+let currentMonth = {year: new Date().getFullYear(), month: new Date().getMonth()};
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s) return s;
+  } catch(e) {}
+  return {
+    checks: {},
+    mood: {},
+    relTime: 0,
+    relMeals: 0,
+    days: {},
+    weights: [],
+    journals: {},
+    nutritionNotes: {},
+    cycleStart: todayKey(),
+    cycleDay: 0,
+  };
+}
+
+function saveState() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function dateKey(y, m, d) {
+  return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+
+// ── CYCLE DAY ──
+function getCycleDay() {
+  const start = new Date(state.cycleStart + 'T00:00:00');
+  const today = new Date(todayKey() + 'T00:00:00');
+  const diff = Math.floor((today - start) / 86400000);
+  return ((state.cycleDay + diff) % 5);
+}
+
+// ── INIT ──
+function init() {
+  renderDates();
+  renderNav();
+  buildAllChecklists();
+  renderHome();
+  renderExercise();
+  renderHistory();
+  renderMood();
+  renderRelCounters();
+  restoreJournal();
+  restoreNutritionNotes();
+  setJournalPrompt();
+  updateAllProgress();
+}
+
+function renderDates() {
+  const now = new Date();
+  const dco = DAYS_CO[now.getDay()];
+  const mco = MONTHS_CO[now.getMonth()];
+  const dateStr = dco + ', ' + now.getDate() + ' de ' + mco + ' de ' + now.getFullYear();
+  document.getElementById('sb-date').textContent = dateStr;
+  document.getElementById('topbar-date').textContent = now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear();
+
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const weekNum = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  document.getElementById('h-week').textContent = 'Sem ' + weekNum;
+}
+
+// ── BUILD CHECKLISTS ──
+function buildAllChecklists() {
+  Object.keys(CHECKLISTS).forEach(tab => {
+    const container = document.getElementById(tab + '-checklist');
+    if (!container) return;
+    container.innerHTML = '';
+    CHECKLISTS[tab].forEach(item => {
+      const tk = todayKey();
+      const done = state.checks[tk] && state.checks[tk][item.id];
+      const el = document.createElement('button');
+      el.className = 'check-item' + (done ? ' done' : '');
+      el.onclick = () => toggleCheck(tab, item.id, el);
+      el.innerHTML = `
+        <div class="check-box">
+          <svg class="check-tick" viewBox="0 0 10 8"><path d="M1 4l3 3L9 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="check-text">
+          <div class="check-title">${item.title}</div>
+          <div class="check-sub">${item.sub}</div>
+        </div>`;
+      container.appendChild(el);
+    });
+  });
+}
+
+function toggleCheck(tab, id, el) {
+  const tk = todayKey();
+  if (!state.checks[tk]) state.checks[tk] = {};
+  state.checks[tk][id] = !state.checks[tk][id];
+  el.classList.toggle('done', state.checks[tk][id]);
+  const box = el.querySelector('.check-box');
+  saveState();
+  updateAllProgress();
+  showToast(state.checks[tk][id] ? '¡Completado!' : 'Desmarcado');
+  recordDayActivity();
+}
+
+function updateAllProgress() {
+  const tk = todayKey();
+  const todayChecks = state.checks[tk] || {};
+  let totalDone = 0, totalAll = 0;
+
+  const areas = ['sleep','exercise','skin','nutrition','mental','posture','relation'];
+  areas.forEach(tab => {
+    const items = CHECKLISTS[tab];
+    const done = items.filter(i => todayChecks[i.id]).length;
+    const pct = Math.round(done / items.length * 100);
+    totalDone += done; totalAll += items.length;
+
+    const progEl = document.getElementById(tab + '-prog');
+    const labelEl = document.getElementById(tab + '-prog-label');
+    if (progEl) progEl.style.width = pct + '%';
+    if (labelEl) labelEl.textContent = done + '/' + items.length;
+    const npEl = document.getElementById('np-' + tab);
+    if (npEl) npEl.textContent = pct + '%';
+  });
+
+  const overallPct = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
+  document.getElementById('h-overall').textContent = overallPct + '%';
+  document.getElementById('h-done').textContent = totalDone;
+  document.getElementById('h-total-sub').textContent = 'de ' + totalAll + ' hoy';
+  document.getElementById('np-home').textContent = overallPct + '%';
+
+  const streak = calcStreak();
+  document.getElementById('h-streak').textContent = streak;
+  document.getElementById('sb-streak').textContent = streak;
+
+  renderAreaBars(todayChecks);
+}
+
+function renderAreaBars(todayChecks) {
+  const areaColors = {
+    sleep:'var(--amber)', exercise:'var(--blue)', skin:'var(--purple)',
+    nutrition:'var(--teal)', mental:'var(--pink)', posture:'var(--accent)', relation:'var(--red)'
+  };
+  const areaNames = {
+    sleep:'Sueño', exercise:'Ejercicio', skin:'Piel',
+    nutrition:'Nutrición', mental:'Mental', posture:'Postura', relation:'Relación'
+  };
+  const container = document.getElementById('area-bars');
+  if (!container) return;
+  container.innerHTML = Object.keys(CHECKLISTS).map(tab => {
+    const items = CHECKLISTS[tab];
+    const done = items.filter(i => todayChecks[i.id]).length;
+    const pct = Math.round(done / items.length * 100);
+    return `<div class="area-row">
+      <div class="area-name">${areaNames[tab]}</div>
+      <div class="area-track"><div class="area-fill" style="width:${pct}%;background:${areaColors[tab]}"></div></div>
+      <div class="area-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function calcStreak() {
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    const dayData = state.days[k];
+    if (dayData && dayData.active) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function recordDayActivity() {
+  const tk = todayKey();
+  if (!state.days[tk]) state.days[tk] = {};
+  const checks = state.checks[tk] || {};
+  const totalDone = Object.values(checks).filter(Boolean).length;
+  state.days[tk].active = totalDone >= 3;
+  state.days[tk].score = totalDone;
+  saveState();
+}
+
+// ── HOME ──
+function renderHome() {}
+
+// ── EXERCISE ──
+function renderExercise() {
+  const cycleDay = getCycleDay();
+  const cycleContainer = document.getElementById('workout-cycle');
+  if (!cycleContainer) return;
+
+  cycleContainer.innerHTML = WORKOUT_CYCLE.map((w, i) => {
+    const isToday = i === cycleDay;
+    const isRest = w.day === 5;
+    return `<div class="workout-day${isToday?' today':''}${isRest?' rest':''}">
+      <div class="workout-day-num">Día ${w.day}</div>
+      <div class="workout-day-info">
+        <div class="workout-day-name">${w.name}</div>
+        <div class="workout-day-muscles">${w.tag}</div>
+      </div>
+      ${isToday ? '<span class="workout-badge badge-today">HOY</span>' : (isRest ? '<span class="workout-badge badge-rest">Recuperación</span>' : '')}
+    </div>`;
+  }).join('');
+
+  const todayWorkout = WORKOUT_CYCLE[cycleDay];
+  const detailTitle = document.getElementById('exercise-detail-title');
+  const detailEl = document.getElementById('exercise-detail');
+  if (detailTitle) detailTitle.textContent = 'Ejercicios de hoy: ' + todayWorkout.name;
+  if (detailEl) {
+    detailEl.innerHTML = todayWorkout.exercises.map(eg => `
+      <div class="exercise-group">
+        <div class="ex-group-title">${eg.group}</div>
+        ${eg.items.map(ex => `
+          <div class="ex-item">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-sets">${ex.sets}</div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  renderWeightHistory();
+}
+
+function saveWeight() {
+  const val = parseFloat(document.getElementById('weight-input').value);
+  if (isNaN(val) || val < 30 || val > 200) { showToast('Peso inválido'); return; }
+  if (!state.weights) state.weights = [];
+  state.weights.push({ date: todayKey(), kg: val });
+  saveState();
+  renderWeightHistory();
+  showToast('Peso registrado: ' + val + ' kg');
+}
+
+function renderWeightHistory() {
+  const el = document.getElementById('weight-history');
+  if (!el || !state.weights || state.weights.length === 0) return;
+  const last5 = state.weights.slice(-5).reverse();
+  el.innerHTML = last5.map(w => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">${formatDate(w.date)}</span><span style="color:var(--accent);font-family:var(--mono)">${w.kg} kg</span></div>`).join('');
+}
+
+function formatDate(key) {
+  const [y,m,d] = key.split('-');
+  return d + ' de ' + MONTHS_CO[parseInt(m)-1];
+}
+
+// ── MOOD ──
+function setMood(m) {
+  const tk = todayKey();
+  state.mood[tk] = m;
+  saveState();
+  renderMood();
+  recordDayActivity();
+  showToast('Estado: ' + m);
+}
+
+function renderMood() {
+  const tk = todayKey();
+  const current = state.mood[tk] || '';
+  document.querySelectorAll('.mood-btn').forEach(b => {
+    b.classList.toggle('sel', b.textContent.trim() === current);
+  });
+}
+
+// ── JOURNAL ──
+const JOURNAL_PROMPTS = [
+  '¿Qué hiciste hoy que te acerca a la persona que quieres ser?',
+  '¿Qué es lo que más valoras de tu relación actual?',
+  '¿Qué hábito de hoy te costó más trabajo? ¿Por qué?',
+  '¿Cómo describirías tu energía hoy en una sola palabra?',
+  '¿Qué aprendiste hoy — del mundo o de ti mismo?',
+  '¿Cuál es el miedo que más te frena actualmente?',
+  '¿Qué harías diferente si pudieras repetir este día?',
+];
+
+function setJournalPrompt() {
+  const today = new Date();
+  const idx = today.getDate() % JOURNAL_PROMPTS.length;
+  const el = document.getElementById('journal-prompt');
+  if (el) el.textContent = '📝 ' + JOURNAL_PROMPTS[idx];
+}
+
+function saveJournal() {
+  const tk = todayKey();
+  const text = document.getElementById('journal-text').value.trim();
+  if (!text) return;
+  state.journals[tk] = text;
+  saveState();
+  showToast('Diario guardado ✓');
+}
+
+function restoreJournal() {
+  const tk = todayKey();
+  const el = document.getElementById('journal-text');
+  if (el && state.journals[tk]) el.value = state.journals[tk];
+}
+
+function saveNutritionNotes() {
+  const tk = todayKey();
+  const text = document.getElementById('nutrition-notes').value.trim();
+  if (!text) return;
+  state.nutritionNotes[tk] = text;
+  saveState();
+  showToast('Nota guardada ✓');
+}
+
+function restoreNutritionNotes() {
+  const tk = todayKey();
+  const el = document.getElementById('nutrition-notes');
+  if (el && state.nutritionNotes[tk]) el.value = state.nutritionNotes[tk];
+}
+
+// ── RELATION ──
+function adjustRel(type, delta) {
+  if (type === 'time') state.relTime = Math.max(0, (state.relTime||0) + delta);
+  if (type === 'meals') state.relMeals = Math.max(0, (state.relMeals||0) + delta);
+  saveState();
+  renderRelCounters();
+}
+
+function renderRelCounters() {
+  const rt = document.getElementById('rel-time');
+  const rm = document.getElementById('rel-meals');
+  if (rt) rt.textContent = state.relTime || 0;
+  if (rm) rm.textContent = state.relMeals || 0;
+}
+
+// ── HISTORY ──
+function renderHistory() {
+  renderMonthCalendar();
+  renderMonthlyStats();
+  renderWeightChart();
+  renderMoodHistory();
+}
+
+function changeMonth(delta) {
+  currentMonth.month += delta;
+  if (currentMonth.month < 0) { currentMonth.month = 11; currentMonth.year--; }
+  if (currentMonth.month > 11) { currentMonth.month = 0; currentMonth.year++; }
+  renderHistory();
+}
+
+function renderMonthCalendar() {
+  const {year, month} = currentMonth;
+  const titleEl = document.getElementById('month-title');
+  if (titleEl) titleEl.textContent = MONTHS_CO[month] + ' ' + year;
+
+  const grid = document.getElementById('month-grid');
+  if (!grid) return;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const today = todayKey();
+
+  let html = DAYS_CO.map(d => `<div class="month-head">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += '<div class="month-day empty"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const k = dateKey(year, month, d);
+    const isToday = k === today;
+    const hasData = state.days[k] && state.days[k].active;
+    const isPast = k < today;
+    let cls = 'month-day';
+    if (isToday) cls += ' today';
+    else if (hasData) cls += ' has-data';
+    else if (isPast) cls += ' no-data';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function renderMonthlyStats() {
+  const {year, month} = currentMonth;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const areas = Object.keys(CHECKLISTS);
+  const areaNames = {sleep:'Sueño',exercise:'Ejercicio',skin:'Piel',nutrition:'Nutrición',mental:'Mental',posture:'Postura',relation:'Relación'};
+
+  const stats = {};
+  areas.forEach(a => { stats[a] = {done:0, possible:0}; });
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const k = dateKey(year, month, d);
+    const dayChecks = state.checks[k] || {};
+    areas.forEach(tab => {
+      CHECKLISTS[tab].forEach(item => {
+        stats[tab].possible++;
+        if (dayChecks[item.id]) stats[tab].done++;
+      });
+    });
+  }
+
+  const el = document.getElementById('monthly-area-stats');
+  if (!el) return;
+  el.innerHTML = areas.map(tab => {
+    const pct = stats[tab].possible > 0 ? Math.round(stats[tab].done / stats[tab].possible * 100) : 0;
+    return `<div class="area-row" style="margin-bottom:8px">
+      <div class="area-name">${areaNames[tab]}</div>
+      <div class="area-track"><div class="area-fill" style="width:${pct}%;background:var(--accent)"></div></div>
+      <div class="area-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeightChart() {
+  const el = document.getElementById('weight-chart-data');
+  if (!el) return;
+  if (!state.weights || state.weights.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin registros de peso aún. Registra tu peso en el tab Ejercicio.</div>';
+    return;
+  }
+  el.innerHTML = state.weights.slice(-10).map(w =>
+    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span style="color:var(--text2)">${formatDate(w.date)}</span>
+      <span style="color:var(--accent);font-family:var(--mono);font-weight:500">${w.kg} kg</span>
+    </div>`
+  ).join('');
+}
+
+function renderMoodHistory() {
+  const {year, month} = currentMonth;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const el = document.getElementById('mood-history');
+  if (!el) return;
+  const entries = [];
+  for (let d = daysInMonth; d >= 1; d--) {
+    const k = dateKey(year, month, d);
+    if (state.mood && state.mood[k]) {
+      entries.push({date: k, mood: state.mood[k]});
+    }
+  }
+  if (entries.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin registros de estado de ánimo este mes.</div>';
+    return;
+  }
+  const moodColors = {Excelente:'var(--accent)',Bien:'var(--teal)',Normal:'var(--text2)',Cansado:'var(--amber)',Ansioso:'var(--amber)',Bajo:'var(--red)'};
+  el.innerHTML = entries.map(e =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--text2)">${formatDate(e.date)}</span>
+      <span style="font-size:12px;font-weight:500;color:${moodColors[e.mood]||'var(--text)'}">${e.mood}</span>
+    </div>`
+  ).join('');
+}
+
+// ── NAVIGATION ──
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const page = btn.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + page).classList.add('active');
+    const titles = {home:'Inicio',sleep:'Sueño',exercise:'Ejercicio',skin:'Piel',nutrition:'Nutrición',mental:'Salud mental',posture:'Postura y Visión',relation:'Relación',history:'Historial mensual',settings:'Ajustes de tareas'};
+    document.getElementById('topbar-title').textContent = titles[page] || page;
+    if (page === 'history') renderHistory();
+    if (page === 'exercise') renderExercise();
+    if (page === 'settings') renderSettings();
+    closeSidebar();
+  });
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── MIDNIGHT RESET CHECK ──
+function checkMidnightReset() {
+  const lastOpen = state.lastOpen || todayKey();
+  if (lastOpen !== todayKey()) {
+    buildAllChecklists();
+    renderMood();
+  }
+  state.lastOpen = todayKey();
+  saveState();
+}
+
+// ── SETTINGS ──
+const AREA_LABELS = {sleep:'🌙 Sueño', exercise:'💪 Ejercicio', skin:'✨ Piel', nutrition:'🥗 Nutrición', mental:'🧠 Mental', posture:'🧍 Postura y Visión', relation:'❤️ Relación'};
+
+// Merge default tasks with any custom tasks saved in state
+function getEffectiveTasks(tab) {
+  // Start from defaults, then apply deletions and edits, then append custom
+  const defaults = CHECKLISTS[tab].map(t => ({...t, _default: true}));
+  const custom = (state.customTasks && state.customTasks[tab]) || [];
+  const deleted = (state.deletedTasks && state.deletedTasks[tab]) || [];
+  const edited = (state.editedTasks && state.editedTasks[tab]) || {};
+
+  const result = defaults
+    .filter(t => !deleted.includes(t.id))
+    .map(t => edited[t.id] ? {...t, ...edited[t.id]} : t);
+
+  return [...result, ...custom];
+}
+
+function renderSettings() {
+  const container = document.getElementById('settings-task-list');
+  if (!container) return;
+
+  container.innerHTML = Object.keys(CHECKLISTS).map(tab => {
+    const tasks = getEffectiveTasks(tab);
+    const deleted = (state.deletedTasks && state.deletedTasks[tab]) || [];
+
+    return `<div class="card st-area-block">
+      <div class="card-title">${AREA_LABELS[tab]}</div>
+      <div>
+        ${tasks.map(task => `
+          <div class="st-task-row" id="st-row-${task.id}">
+            <div class="st-task-info">
+              <div class="st-task-title">${escHtml(task.title)}${task._default ? '<span class="st-default-badge">base</span>' : ''}</div>
+              ${task.sub ? `<div class="st-task-sub">${escHtml(task.sub)}</div>` : ''}
+            </div>
+            <div class="st-task-actions">
+              <button class="st-btn" onclick="openEditModal('${tab}','${task.id}')">Editar</button>
+              <button class="st-btn st-btn-del" onclick="deleteTask('${tab}','${task.id}',${!!task._default})">✕</button>
+            </div>
+          </div>`).join('')}
+        ${tasks.length === 0 ? '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin tareas en esta área.</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function addCustomTask() {
+  const area = document.getElementById('st-area').value;
+  const title = document.getElementById('st-title').value.trim();
+  const sub = document.getElementById('st-sub').value.trim();
+  if (!title) { showToast('Escribe el nombre de la tarea'); return; }
+
+  if (!state.customTasks) state.customTasks = {};
+  if (!state.customTasks[area]) state.customTasks[area] = [];
+
+  const id = 'c_' + area + '_' + Date.now();
+  state.customTasks[area].push({id, title, sub});
+  saveState();
+
+  // Clear form
+  document.getElementById('st-title').value = '';
+  document.getElementById('st-sub').value = '';
+
+  // Rebuild checklists so task shows up immediately
+  buildAllChecklists();
+  updateAllProgress();
+  renderSettings();
+  showToast('Tarea agregada ✓');
+}
+
+function deleteTask(tab, id, isDefault) {
+  if (!confirm('¿Eliminar esta tarea? No afecta el historial pasado.')) return;
+
+  if (isDefault) {
+    // Mark default task as deleted
+    if (!state.deletedTasks) state.deletedTasks = {};
+    if (!state.deletedTasks[tab]) state.deletedTasks[tab] = [];
+    if (!state.deletedTasks[tab].includes(id)) state.deletedTasks[tab].push(id);
+  } else {
+    // Remove from custom tasks
+    if (state.customTasks && state.customTasks[tab]) {
+      state.customTasks[tab] = state.customTasks[tab].filter(t => t.id !== id);
+    }
+  }
+
+  saveState();
+  buildAllChecklists();
+  updateAllProgress();
+  renderSettings();
+  showToast('Tarea eliminada');
+}
+
+function openEditModal(tab, id) {
+  const tasks = getEffectiveTasks(tab);
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+
+  document.getElementById('edit-area').value = tab;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-title').value = task.title;
+  document.getElementById('edit-sub').value = task.sub || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveEditTask() {
+  const tab = document.getElementById('edit-area').value;
+  const id = document.getElementById('edit-id').value;
+  const title = document.getElementById('edit-title').value.trim();
+  const sub = document.getElementById('edit-sub').value.trim();
+  if (!title) { showToast('El nombre no puede estar vacío'); return; }
+
+  // Check if it's a custom task or default
+  const isCustom = state.customTasks && state.customTasks[tab] && state.customTasks[tab].find(t => t.id === id);
+
+  if (isCustom) {
+    const idx = state.customTasks[tab].findIndex(t => t.id === id);
+    if (idx > -1) { state.customTasks[tab][idx].title = title; state.customTasks[tab][idx].sub = sub; }
+  } else {
+    // Edit default task
+    if (!state.editedTasks) state.editedTasks = {};
+    if (!state.editedTasks[tab]) state.editedTasks[tab] = {};
+    state.editedTasks[tab][id] = {title, sub};
+  }
+
+  saveState();
+  closeEditModal();
+  buildAllChecklists();
+  updateAllProgress();
+  renderSettings();
+  showToast('Tarea actualizada ✓');
+}
+
+// Close modal clicking outside
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+
+// ── OVERRIDE buildAllChecklists to use effective tasks ──
+function buildAllChecklists() {
+  Object.keys(CHECKLISTS).forEach(tab => {
+    const container = document.getElementById(tab + '-checklist');
+    if (!container) return;
+    container.innerHTML = '';
+    const tasks = getEffectiveTasks(tab);
+    const tk = todayKey();
+
+    tasks.forEach(item => {
+      const done = state.checks[tk] && state.checks[tk][item.id];
+      const el = document.createElement('button');
+      el.className = 'check-item' + (done ? ' done' : '');
+      el.onclick = () => toggleCheck(tab, item.id, el);
+      el.innerHTML = `
+        <div class="check-box">
+          <svg class="check-tick" viewBox="0 0 10 8"><path d="M1 4l3 3L9 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="check-text">
+          <div class="check-title">${escHtml(item.title)}</div>
+          <div class="check-sub">${escHtml(item.sub||'')}</div>
+        </div>`;
+      container.appendChild(el);
+    });
+  });
+}
+
+// ── OVERRIDE updateAllProgress to use effective task counts ──
+function updateAllProgress() {
+  const tk = todayKey();
+  const todayChecks = state.checks[tk] || {};
+  let totalDone = 0, totalAll = 0;
+
+  const areas = ['sleep','exercise','skin','nutrition','mental','posture','relation'];
+  areas.forEach(tab => {
+    const items = getEffectiveTasks(tab);
+    const done = items.filter(i => todayChecks[i.id]).length;
+    const pct = items.length > 0 ? Math.round(done / items.length * 100) : 0;
+    totalDone += done; totalAll += items.length;
+
+    const progEl = document.getElementById(tab + '-prog');
+    const labelEl = document.getElementById(tab + '-prog-label');
+    if (progEl) progEl.style.width = pct + '%';
+    if (labelEl) labelEl.textContent = done + '/' + items.length;
+    const npEl = document.getElementById('np-' + tab);
+    if (npEl) npEl.textContent = pct + '%';
+  });
+
+  const overallPct = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
+  document.getElementById('h-overall').textContent = overallPct + '%';
+  document.getElementById('h-done').textContent = totalDone;
+  document.getElementById('h-total-sub').textContent = 'de ' + totalAll + ' hoy';
+  document.getElementById('np-home').textContent = overallPct + '%';
+
+  const streak = calcStreak();
+  document.getElementById('h-streak').textContent = streak;
+  document.getElementById('sb-streak').textContent = streak;
+
+  renderAreaBars(todayChecks);
+}
+
+checkMidnightReset();
+init();
+</script>
+</body>
+</html>
